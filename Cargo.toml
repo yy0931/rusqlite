@@ -137,8 +137,7 @@ unicase = "2.6.0"
 bencher = "0.1"
 
 [dependencies.libsqlite3-sys]
-path = "libsqlite3-sys"
-version = "0.26.0"
+path = "./libsqlite3-sys"
 
 [[test]]
 name = "config_log"
