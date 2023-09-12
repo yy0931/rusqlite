@@ -1,0 +1,58 @@
+name: Upgrade bundled SQLite
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update libsqlite3-sys/upgrade.sh
+        id: update-script
+        run: |
+          # Parse the CSV in SQLite's download page
+          PAGE_CONTENT=$(curl -s "https://www.sqlite.org/download.html")
+          SQLITE_VERSION=$(echo "$PAGE_CONTENT" | sed -En 's/PRODUCT,(.*),.*sqlite-amalgamation.*,.*/\1/p')
+          SQLITE_RELATIVE_URL=$(echo "$PAGE_CONTENT" | sed -En 's/PRODUCT,.*,([[:digit:]]+\/sqlite-amalgamation-[[:digit:]]+\.zip),.*/\1/p')
+
+          echo "$SQLITE_VERSION"  # "3.43.1"
+          echo "$SQLITE_RELATIVE_URL"  # "2023/sqlite-amalgamation-3430000.zip"
+
+          YEAR=$(dirname "$SQLITE_RELATIVE_URL")
+          echo "$YEAR"  # 2023
+
+          SQLITE=$(basename "$SQLITE_RELATIVE_URL" .zip)
+          echo "$SQLITE"  # "sqlite-amalgamation-3430000"
+
+          # Update libsqlite3-sys/upgrade.sh
+          sed -i -r "s|SQLITE=sqlite-amalgamation-[0-9]+|SQLITE=$SQLITE|" libsqlite3-sys/upgrade.sh
+          sed -i -r "s|https://sqlite.org/[0-9]+|https://sqlite.org/$YEAR|" libsqlite3-sys/upgrade.sh
+
+          echo "sqlite_version=$SQLITE_VERSION" >> "$GITHUB_OUTPUT"
+          if git diff --quiet libsqlite3-sys/upgrade.sh; then
+              echo "updated=false" >> "$GITHUB_OUTPUT"
+          else
+              echo "updated=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: hecrj/setup-rust-action@v1
+        if: ${{ steps.update-script.outputs.updated == 'true' }}
+
+      - name: Run libsqlite3-sys/upgrade.sh
+        run: |
+          ./libsqlite3-sys/upgrade.sh
+        if: ${{ steps.update-script.outputs.updated == 'true' }}
+
+      - name: Create a Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: Upgrade SQLite bundled version to ${{ steps.update-script.outputs.sqlite_version }}
+          delete-branch: true
+          title: Upgrade SQLite bundled version to ${{ steps.update-script.outputs.sqlite_version }}
+          base: master
+        if: ${{ steps.update-script.outputs.updated == 'true' }}
+
+permissions:
+  contents: write
+  pull-requests: write
