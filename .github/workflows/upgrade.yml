@@ -1,7 +1,7 @@
 name: Upgrade bundled SQLite
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '30 * * * *'
 jobs:
   create_pull_request:
     runs-on: ubuntu-latest
