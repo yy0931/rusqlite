@@ -23,10 +23,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 
-pub const SQLITE_VERSION: &[u8; 7] = b"3.49.1\0";
-pub const SQLITE_VERSION_NUMBER: i32 = 3049001;
+pub const SQLITE_VERSION: &[u8; 7] = b"3.50.4\0";
+pub const SQLITE_VERSION_NUMBER: i32 = 3050004;
 pub const SQLITE_SOURCE_ID: &[u8; 85] =
-    b"2025-02-18 13:38:58 873d4e274b4988d260ba8354a9718324a1c26187a4ab4c1cc0227c03d0f10e70\0";
+    b"2025-07-30 19:33:53 4d8adfb30e03f9cf27f800a2c1ba3c48fb4ca1b08b0f5ed59a4d5ecbf45e20a3\0";
 pub const SQLITE_OK: i32 = 0;
 pub const SQLITE_ERROR: i32 = 1;
 pub const SQLITE_INTERNAL: i32 = 2;
@@ -224,6 +224,7 @@ pub const SQLITE_FCNTL_EXTERNAL_READER: i32 = 40;
 pub const SQLITE_FCNTL_CKSM_FILE: i32 = 41;
 pub const SQLITE_FCNTL_RESET_CACHE: i32 = 42;
 pub const SQLITE_FCNTL_NULL_IO: i32 = 43;
+pub const SQLITE_FCNTL_BLOCK_ON_CONNECT: i32 = 44;
 pub const SQLITE_GET_LOCKPROXYFILE: i32 = 2;
 pub const SQLITE_SET_LOCKPROXYFILE: i32 = 3;
 pub const SQLITE_LAST_ERRNO: i32 = 4;
@@ -288,6 +289,7 @@ pub const SQLITE_DBCONFIG_ENABLE_ATTACH_CREATE: i32 = 1020;
 pub const SQLITE_DBCONFIG_ENABLE_ATTACH_WRITE: i32 = 1021;
 pub const SQLITE_DBCONFIG_ENABLE_COMMENTS: i32 = 1022;
 pub const SQLITE_DBCONFIG_MAX: i32 = 1022;
+pub const SQLITE_SETLK_BLOCK_ON_CONNECT: i32 = 1;
 pub const SQLITE_DENY: i32 = 1;
 pub const SQLITE_IGNORE: i32 = 2;
 pub const SQLITE_CREATE_INDEX: i32 = 1;
@@ -927,6 +929,13 @@ extern "C" {
     pub fn sqlite3_busy_timeout(
         arg1: *mut sqlite3,
         ms: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3_setlk_timeout(
+        arg1: *mut sqlite3,
+        ms: ::std::os::raw::c_int,
+        flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -3112,16 +3121,6 @@ extern "C" {
         pA: *mut ::std::os::raw::c_void,
         nB: ::std::os::raw::c_int,
         pB: *mut ::std::os::raw::c_void,
-        pnOut: *mut ::std::os::raw::c_int,
-        ppOut: *mut *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn sqlite3changeset_upgrade(
-        db: *mut sqlite3,
-        zDb: *const ::std::os::raw::c_char,
-        nIn: ::std::os::raw::c_int,
-        pIn: *const ::std::os::raw::c_void,
         pnOut: *mut ::std::os::raw::c_int,
         ppOut: *mut *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
