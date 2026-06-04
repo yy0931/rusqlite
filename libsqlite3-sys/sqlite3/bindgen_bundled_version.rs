@@ -23,13 +23,13 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 
-pub const SQLITE_VERSION: &[u8; 7] = b"3.51.2\0";
-pub const SQLITE_VERSION_NUMBER: i32 = 3051002;
+pub const SQLITE_VERSION: &[u8; 7] = b"3.53.2\0";
+pub const SQLITE_VERSION_NUMBER: i32 = 3053002;
 pub const SQLITE_SOURCE_ID: &[u8; 85] =
-    b"2026-01-09 17:27:48 b270f8339eb13b504d0b2ba154ebca966b7dde08e40c3ed7d559749818cb2075\0";
-pub const SQLITE_SCM_BRANCH: &[u8; 12] = b"branch-3.51\0";
-pub const SQLITE_SCM_TAGS: &[u8; 23] = b"release version-3.51.2\0";
-pub const SQLITE_SCM_DATETIME: &[u8; 25] = b"2026-01-09T17:27:48.405Z\0";
+    b"2026-06-03 19:12:13 d6e03d8c777cfa2d35e3b60d8ec3e0187f3e9f99d8e2ee9cac695fd6fcdf1a24\0";
+pub const SQLITE_SCM_BRANCH: &[u8; 12] = b"branch-3.53\0";
+pub const SQLITE_SCM_TAGS: &[u8; 23] = b"release version-3.53.2\0";
+pub const SQLITE_SCM_DATETIME: &[u8; 25] = b"2026-06-03T19:12:13.350Z\0";
 pub const SQLITE_OK: i32 = 0;
 pub const SQLITE_ERROR: i32 = 1;
 pub const SQLITE_INTERNAL: i32 = 2;
@@ -297,7 +297,8 @@ pub const SQLITE_DBCONFIG_REVERSE_SCANORDER: i32 = 1019;
 pub const SQLITE_DBCONFIG_ENABLE_ATTACH_CREATE: i32 = 1020;
 pub const SQLITE_DBCONFIG_ENABLE_ATTACH_WRITE: i32 = 1021;
 pub const SQLITE_DBCONFIG_ENABLE_COMMENTS: i32 = 1022;
-pub const SQLITE_DBCONFIG_MAX: i32 = 1022;
+pub const SQLITE_DBCONFIG_FP_DIGITS: i32 = 1023;
+pub const SQLITE_DBCONFIG_MAX: i32 = 1023;
 pub const SQLITE_SETLK_BLOCK_ON_CONNECT: i32 = 1;
 pub const SQLITE_DENY: i32 = 1;
 pub const SQLITE_IGNORE: i32 = 2;
@@ -351,10 +352,12 @@ pub const SQLITE_LIMIT_LIKE_PATTERN_LENGTH: i32 = 8;
 pub const SQLITE_LIMIT_VARIABLE_NUMBER: i32 = 9;
 pub const SQLITE_LIMIT_TRIGGER_DEPTH: i32 = 10;
 pub const SQLITE_LIMIT_WORKER_THREADS: i32 = 11;
+pub const SQLITE_LIMIT_PARSER_DEPTH: i32 = 12;
 pub const SQLITE_PREPARE_PERSISTENT: ::std::os::raw::c_uint = 1;
 pub const SQLITE_PREPARE_NORMALIZE: ::std::os::raw::c_uint = 2;
 pub const SQLITE_PREPARE_NO_VTAB: ::std::os::raw::c_uint = 4;
 pub const SQLITE_PREPARE_DONT_LOG: ::std::os::raw::c_uint = 16;
+pub const SQLITE_PREPARE_FROM_DDL: ::std::os::raw::c_uint = 32;
 pub const SQLITE_INTEGER: i32 = 1;
 pub const SQLITE_FLOAT: i32 = 2;
 pub const SQLITE_BLOB: i32 = 4;
@@ -367,6 +370,7 @@ pub const SQLITE_UTF16BE: i32 = 3;
 pub const SQLITE_UTF16: i32 = 4;
 pub const SQLITE_ANY: i32 = 5;
 pub const SQLITE_UTF16_ALIGNED: i32 = 8;
+pub const SQLITE_UTF8_ZT: i32 = 16;
 pub const SQLITE_DETERMINISTIC: i32 = 2048;
 pub const SQLITE_DIRECTONLY: i32 = 524288;
 pub const SQLITE_SUBTYPE: i32 = 1048576;
@@ -450,6 +454,7 @@ pub const SQLITE_TESTCTRL_TRACEFLAGS: i32 = 31;
 pub const SQLITE_TESTCTRL_TUNE: i32 = 32;
 pub const SQLITE_TESTCTRL_LOGEST: i32 = 33;
 pub const SQLITE_TESTCTRL_USELONGDOUBLE: i32 = 34;
+pub const SQLITE_TESTCTRL_ATOF: i32 = 34;
 pub const SQLITE_TESTCTRL_LAST: i32 = 34;
 pub const SQLITE_STATUS_MEMORY_USED: i32 = 0;
 pub const SQLITE_STATUS_PAGECACHE_USED: i32 = 1;
@@ -530,6 +535,7 @@ pub const SQLITE_CHANGESETAPPLY_NOSAVEPOINT: i32 = 1;
 pub const SQLITE_CHANGESETAPPLY_INVERT: i32 = 2;
 pub const SQLITE_CHANGESETAPPLY_IGNORENOOP: i32 = 4;
 pub const SQLITE_CHANGESETAPPLY_FKNOACTION: i32 = 8;
+pub const SQLITE_CHANGESETAPPLY_NOUPDATELOOP: i32 = 16;
 pub const SQLITE_CHANGESET_DATA: i32 = 1;
 pub const SQLITE_CHANGESET_NOTFOUND: i32 = 2;
 pub const SQLITE_CHANGESET_CONFLICT: i32 = 3;
@@ -539,6 +545,7 @@ pub const SQLITE_CHANGESET_OMIT: i32 = 0;
 pub const SQLITE_CHANGESET_REPLACE: i32 = 1;
 pub const SQLITE_CHANGESET_ABORT: i32 = 2;
 pub const SQLITE_SESSION_CONFIG_STRMSIZE: i32 = 1;
+pub const SQLITE_CHANGEGROUP_CONFIG_PATCHSET: i32 = 1;
 pub const FTS5_TOKENIZE_QUERY: i32 = 1;
 pub const FTS5_TOKENIZE_PREFIX: i32 = 2;
 pub const FTS5_TOKENIZE_DOCUMENT: i32 = 4;
@@ -1824,9 +1831,9 @@ extern "C" {
 extern "C" {
     pub fn sqlite3_result_text64(
         arg1: *mut sqlite3_context,
-        arg2: *const ::std::os::raw::c_char,
-        arg3: sqlite3_uint64,
-        arg4: ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
+        z: *const ::std::os::raw::c_char,
+        n: sqlite3_uint64,
+        arg2: ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
         encoding: ::std::os::raw::c_uchar,
     );
 }
@@ -2482,6 +2489,9 @@ extern "C" {
     pub fn sqlite3_str_finish(arg1: *mut sqlite3_str) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
+    pub fn sqlite3_str_free(arg1: *mut sqlite3_str);
+}
+extern "C" {
     pub fn sqlite3_str_appendf(arg1: *mut sqlite3_str, zFormat: *const ::std::os::raw::c_char, ...);
 }
 extern "C" {
@@ -2503,6 +2513,9 @@ extern "C" {
 }
 extern "C" {
     pub fn sqlite3_str_reset(arg1: *mut sqlite3_str);
+}
+extern "C" {
+    pub fn sqlite3_str_truncate(arg1: *mut sqlite3_str, N: ::std::os::raw::c_int);
 }
 extern "C" {
     pub fn sqlite3_str_errcode(arg1: *mut sqlite3_str) -> ::std::os::raw::c_int;
@@ -2934,6 +2947,17 @@ extern "C" {
         szDb: sqlite3_int64,
         szBuf: sqlite3_int64,
         mFlags: ::std::os::raw::c_uint,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3_carray_bind_v2(
+        pStmt: *mut sqlite3_stmt,
+        i: ::std::os::raw::c_int,
+        aData: *mut ::std::os::raw::c_void,
+        nData: ::std::os::raw::c_int,
+        mFlags: ::std::os::raw::c_int,
+        xDel: ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
+        pDel: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -3545,6 +3569,70 @@ extern "C" {
     pub fn sqlite3session_config(
         op: ::std::os::raw::c_int,
         pArg: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_config(
+        arg1: *mut sqlite3_changegroup,
+        arg2: ::std::os::raw::c_int,
+        pArg: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_begin(
+        arg1: *mut sqlite3_changegroup,
+        eOp: ::std::os::raw::c_int,
+        zTab: *const ::std::os::raw::c_char,
+        bIndirect: ::std::os::raw::c_int,
+        pzErr: *mut *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_int64(
+        arg1: *mut sqlite3_changegroup,
+        bNew: ::std::os::raw::c_int,
+        iCol: ::std::os::raw::c_int,
+        iVal: sqlite3_int64,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_null(
+        arg1: *mut sqlite3_changegroup,
+        arg2: ::std::os::raw::c_int,
+        arg3: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_double(
+        arg1: *mut sqlite3_changegroup,
+        arg2: ::std::os::raw::c_int,
+        arg3: ::std::os::raw::c_int,
+        arg4: f64,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_text(
+        arg1: *mut sqlite3_changegroup,
+        arg2: ::std::os::raw::c_int,
+        arg3: ::std::os::raw::c_int,
+        pVal: *const ::std::os::raw::c_char,
+        nVal: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_blob(
+        arg1: *mut sqlite3_changegroup,
+        arg2: ::std::os::raw::c_int,
+        arg3: ::std::os::raw::c_int,
+        pVal: *const ::std::os::raw::c_void,
+        nVal: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn sqlite3changegroup_change_finish(
+        arg1: *mut sqlite3_changegroup,
+        bDiscard: ::std::os::raw::c_int,
+        pzErr: *mut *mut ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
 #[repr(C)]
